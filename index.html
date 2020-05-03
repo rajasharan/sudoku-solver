@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sudoku solver</title>
+    <link rel="stylesheet" href="./vendor-libs/bulma.min.css">
+    <link rel="stylesheet" href="./vendor-libs/buefy.min.css">
+    <script src="./vendor-libs/vue.js"></script>
+    <script src="./vendor-libs/buefy.min.js"></script>
+</head>
+<body>
+    <section class="hero is-primary is-bold">
+      <div class="hero-body">
+        <div class="container">
+          <h1 class="title">Sudoku Solver</h1>
+          <h2 class="subtitle">Using backtracking algorithm</h2>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="columns">
+        <div class="column is-one-fifth"></div>
+      
+        <div id="sudoku" class="column">
+            <svg width="320" height="320" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
+                <defs>
+                    <pattern id="smallGrid" width="32" height="32" patternUnits="userSpaceOnUse">
+                        <path d="M 32 0 L 0 0 0 32" fill="none" stroke="gray" stroke-width="0.5" />
+                    </pattern>
+                    <pattern id="grid" width="96" height="96" patternUnits="userSpaceOnUse">
+                        <rect width="96" height="96" fill="url(#smallGrid)" />
+                        <path d="M 96 0 L 0 0 0 96" fill="none" stroke="gray" stroke-width="1.5" />
+                    </pattern>
+                </defs>
+
+                <svg:style>
+                    .txt { font-size: 2.5em; font-family: monospace; cursor: pointer }
+                    .none { fill-opacity: 0.02 }
+                    .default { fill: orange }
+                    .new { fill: black; fill-opacity: 0.6 }
+                </svg:style>
+
+                <rect width="289" height="289" fill="url(#grid)" />
+                <text 
+                    class="txt"
+                    v-for="item in itemsHelper"
+                    :key="item.id"
+                    :x="item.x"
+                    :y="item.y"
+                    :class="{ none: fill(item.i, item.j) === 'none', default: fill(item.i, item.j) === 'default', new: fill(item.i, item.j) === 'new' }"
+                    @click="update($event, item.i, item.j)">
+                        {{item.num}}
+                </text>
+            </svg>
+
+            <div class="buttons">
+              <button class="button is-success" @click="solve" v-bind:disabled="inprogress">Solve</button>
+              <button class="button is-danger" @click="reset" v-bind:disabled="inprogress">Reset</button>
+            </div>
+
+            <label class="range">
+              <!--Delay: <input class="slider" v-model="speed" step="50" min="0" max="300" value="50" type="range" @change="speedChanged">-->
+            </label>
+
+            <div class="columns">
+              <div class="column is-two-fifths">
+                <b-field label="Delay (ms)">
+                  <b-slider class="slider" v-model="speed" :step="1" :min="0" :max="300" @change="speedChanged">
+                    <template v-for="val in [50, 150, 250]">
+                      <b-slider-tick :value="val" :key="val">{{val}}</b-slider-tick>
+                    </template>
+                  </b-slider>
+                </b-field>
+              </div>
+            </div>
+        </div>
+      </div>
+    </section>
+    <script src="./app.js"></script>
+</body>
+</html>
