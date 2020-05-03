@@ -110,7 +110,8 @@ const app = new Vue({
             this.find('82', 8);
             this.find('17', 4);
             this.find('36', 4);
-
+            this.find('34', 8);
+            this.find('66', 9);
 
             this.toArray();
         },
