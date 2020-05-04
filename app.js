@@ -7,7 +7,18 @@ worker.addEventListener('message', function (e) {
     }
     else if (cmd === 'done') {
         app.inprogress = false;
-        app.displayError(result);
+        app.display(result);
+    }
+    else if (cmd === 'verified') {
+        const { conflict, i, j } = result;
+        if (conflict) {
+            app.inprogress = false;
+            app.display(false, i, j);
+        }
+        else {
+            worker.postMessage({cmd: 'solve', items: app.items, speed: app.speed});
+            app.inprogress = true;
+        }
     }
 }, false);
 
@@ -44,9 +55,7 @@ const app = new Vue({
             else return 'new';
         },
         solve: function () {
-            worker.postMessage({cmd: 'solve', items: this.items, speed: this.speed});
-            this.fromArray();
-            this.inprogress = true;
+            worker.postMessage({cmd: 'verify', items: this.items});
         },
         log: function () {
             console.log(this.items);
@@ -125,7 +134,7 @@ const app = new Vue({
             e.num = num;
             e.default = true;
         },
-        displayError: function (result) {
+        display: function (result, i, j) {
             console.log(result);
             if (result) this.$buefy.snackbar.open({
                 message: 'Finished',
@@ -134,7 +143,7 @@ const app = new Vue({
 
             else this.$buefy.snackbar.open({
                 duration: 6000,
-                message: 'ERROR - cannot solve',
+                message: i ? `CONFLICT at (${i}, ${j})` : 'ERROR - cannot solve',
                 type: 'is-danger',
                 position: 'is-bottom',
             });

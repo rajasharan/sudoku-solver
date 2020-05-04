@@ -1,4 +1,55 @@
 const SIZE = 9;
+function verify(items) {
+  for (let i=0; i<SIZE; i++) {
+    const test = [];
+    for (let j=0; j<SIZE; j++) {
+      const item = items[i][j];
+      if (item !== 0) {
+        const count = test[item];
+        if (count) return {conflict: true, i: j+1, j: i+1};
+        else {
+          test[item] = 1;
+        }
+      }
+    }
+  }
+
+  for (let j=0; j<SIZE; j++){
+    const test = [];
+    for (let i=0; i<SIZE; i++) {
+      const item = items[i][j];
+      if (item !== 0) {
+        const count = test[item];
+        if (count) return {conflict: true, i: j+1, j: i+1};
+        else {
+          test[item] = 1;
+        }
+      }
+    }
+  }
+
+  const g = [0, 3, 6];
+  for (let k=0; k<SIZE; k = k+(SIZE/3)) {
+    for (let l=0; l<SIZE; l = l+(SIZE/3)) {
+      const test = [];
+      for (let i=k; i<SIZE/3; i++) {
+        for (let j=l; j<SIZE/3; j++) {
+          const item = items[i][j];
+          if (item !== 0) {
+            const count = test[item];
+            if (count) return {conflict: true, i: j+1, j: i+1};
+            else {
+              test[count] = 1;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  return {conflict: false};
+}
+
 function noConflicts(i, j, num, items) {
   for (let k=0; k<SIZE; k++) {
     if (items[i][k] === num) return false
@@ -59,13 +110,21 @@ async function solve(items, context) {
 self.addEventListener('message', async function (e) {
   const { cmd, items, speed } = e.data;
   switch (cmd) {
-    case 'solve':
+    case 'solve': {
       const result = await solve(items, self);
       self.speed = speed;
-      self.postMessage({cmd: 'done', i:-1, j:-1, num:-1, result});
+      self.postMessage({cmd: 'done', result});
       break;
-    case 'speed':
+    }
+    case 'speed': {
       self.speed = speed;
       break;
+    }
+    case 'verify': {
+      const result = await verify(items);
+      console.log(result);
+      self.postMessage({cmd: 'verified', result});
+      break;
+    }
   };
 }, false);
