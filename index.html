@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Sudoku solver</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="./vendor-libs/bulma.min.css">
     <link rel="stylesheet" href="./vendor-libs/buefy.min.css">
     <script src="./vendor-libs/vue.js"></script>
     <script src="./vendor-libs/buefy.min.js"></script>
@@ -60,10 +59,6 @@
               <button class="button is-success" @click="solve" v-bind:disabled="inprogress">Solve</button>
               <button class="button is-danger" @click="reset" v-bind:disabled="inprogress">Reset</button>
             </div>
-
-            <label class="range">
-              <!--Delay: <input class="slider" v-model="speed" step="50" min="0" max="300" value="50" type="range" @change="speedChanged">-->
-            </label>
 
             <div class="columns">
               <div class="column is-two-fifths">
