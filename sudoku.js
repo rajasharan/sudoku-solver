@@ -28,18 +28,18 @@ function verify(items) {
     }
   }
 
-  const g = [0, 3, 6];
+  // verify each 3x3 grid
   for (let k=0; k<SIZE; k = k+(SIZE/3)) {
     for (let l=0; l<SIZE; l = l+(SIZE/3)) {
       const test = [];
-      for (let i=k; i<SIZE/3; i++) {
-        for (let j=l; j<SIZE/3; j++) {
+      for (let i=k; i<k+SIZE/3; i++) {
+        for (let j=l; j<l+SIZE/3; j++) {
           const item = items[i][j];
           if (item !== 0) {
             const count = test[item];
             if (count) return {conflict: true, i: j+1, j: i+1};
             else {
-              test[count] = 1;
+              test[item] = 1;
             }
           }
         }
