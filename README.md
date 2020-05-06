@@ -1,5 +1,5 @@
 # Sudoku Solver
-Using backtracking algorimth
+Using backtracking algorithm
 
 ## Live demo
 https://rajasharan.github.io/sudoku-solver/
