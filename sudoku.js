@@ -77,32 +77,52 @@ function timeout(ms) {
 
 async function update(i, j, num, items, context) {
   items[i][j] = num;
-  context.postMessage({cmd: 'inprogress', i, j, num});
+  context.steps += 1;
+  context.postMessage({cmd: 'inprogress', i, j, num, steps: context.steps});
   await timeout(context.speed);
 }
 
+/*
+ * most constrained square selection
+ * (select the square with least possible choices to pick from)
+ */
 function findNext(items) {
+  let min = SIZE + 1;
+  let result = {};
+  let done = true;
   for (let i=0; i<SIZE; i++) {
     for (let j=0; j<SIZE; j++) {
-      if (items[i][j] === 0) return {i, j};
+      if (items[i][j] === 0) {
+        done = false;
+        let nums = [];
+        for (let num=1; num<=SIZE; num++) {
+          if (noConflicts(i, j, num, items)) {
+            nums.push(num);
+          }
+        }
+        if (nums.length < min) {
+          min = nums.length;
+          result.i = i;
+          result.j = j;
+          result.nums = nums;
+        }
+      }
     }
   }
-  
-  return false;
+
+  result.done = done;
+  return result;
 }
 
 async function solve(items, context) {
-  const next = findNext(items);
-  if (!next) return true;
+  const {i, j, nums, done} = findNext(items);
+  if (done) return true;
+  if (nums.length === 0) return false; // with look ahead; if possible choices is empty then reject
 
-  const {i, j} = next;
-
-  for (let num=1; num<=9; num++) {
-    if (noConflicts(i,j,num,items)) {
-      await update(i,j,num,items,context);
-      if (await solve(items, context)) return true;
-      await update(i,j,0,items,context);
-    }
+  for (let n=0; n<nums.length; n++) {
+    await update(i,j,nums[n],items,context);
+    if (await solve(items, context)) return true;
+    await update(i,j,0,items,context);
   }
   return false;
 }
@@ -111,9 +131,10 @@ self.addEventListener('message', async function (e) {
   const { cmd, items, speed } = e.data;
   switch (cmd) {
     case 'solve': {
-      const result = await solve(items, self);
       self.speed = speed;
-      self.postMessage({cmd: 'done', result});
+      self.steps = 0;
+      const result = await solve(items, self);
+      self.postMessage({cmd: 'done', result, steps: self.steps});
       break;
     }
     case 'speed': {

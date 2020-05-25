@@ -1,13 +1,15 @@
 const worker = new Worker('sudoku.js');
 worker.addEventListener('message', function (e) {
-    const { cmd, i, j, num, result } = e.data;
+    const { cmd, i, j, num, result, steps } = e.data;
     if (cmd === 'inprogress') {
         app.items[i][j] = num;
         app.fromArray();
+        app.steps = steps;
     }
     else if (cmd === 'done') {
         app.inprogress = false;
         app.display(result);
+        app.steps = steps;
     }
     else if (cmd === 'verified') {
         const { conflict, i, j } = result;
@@ -31,6 +33,8 @@ const app = new Vue({
         itemsHelper: [], // 1d representation of above grid
         inprogress: false,
         speed: 50,
+        steps: 0,
+        msg: '',
     },
     computed: {
     },
@@ -44,7 +48,7 @@ const app = new Vue({
             const obj = this.itemsHelper.find(obj => obj.i === i && obj.j === j);
             if (obj) {
                 obj.num = (obj.num + 1) % 10;
-                obj.default = true;
+                obj.default = obj.num > 0 ? true : false;
                 this.items[j][i] = obj.num;
             }
         },
@@ -80,6 +84,8 @@ const app = new Vue({
             }
         },
         reset: function () {
+            this.steps = 0;
+            this.msg = '';
             this.itemsHelper = [];
             for (const i of Array(9).keys()) {
                 for (const j of Array(9).keys()) {
@@ -136,17 +142,22 @@ const app = new Vue({
         },
         display: function (result, i, j) {
             console.log(result);
-            if (result) this.$buefy.snackbar.open({
-                message: 'Finished',
-                position: 'is-bottom',
-            });
-
-            else this.$buefy.snackbar.open({
-                duration: 6000,
-                message: i ? `CONFLICT at (${i}, ${j})` : 'ERROR - cannot solve',
-                type: 'is-danger',
-                position: 'is-bottom',
-            });
+            if (result) {
+                this.msg = 'Finished',
+                this.$buefy.snackbar.open({
+                    message: this.msg,
+                    position: 'is-bottom',
+                });
+            }
+            else {
+                this.msg = i ? `CONFLICT at (${i}, ${j})` : 'ERROR - cannot solve';
+                this.$buefy.snackbar.open({
+                    duration: 6000,
+                    message: this.msg,
+                    type: 'is-danger',
+                    position: 'is-bottom',
+                });
+            }
         },
     },
 });

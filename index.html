@@ -10,6 +10,9 @@
     <script src="./vendor-libs/buefy.min.js"></script>
     <style>
         .container .subtitle {
+            margin-bottom: 0px;
+        }
+        .container .subtitle.is-6 {
             margin-bottom: 5px;
         }
     </style>
@@ -22,7 +25,8 @@
             <div class="column is-one-fifth"></div>
             <div class="column">
               <h1 class="title">Sudoku Solver</h1>
-              <h2 class="subtitle">Using backtracking algorithm</h2>
+              <h2 class="subtitle">Using Backtracking Algorithm</h2>
+              <h2 class="subtitle is-6">(with Most Constrained Square Selection)</h2>
               <a class="button is-small is-link is-inverted" href="https://github.com/rajasharan/sudoku-solver">
                 <span>View on GitHub</span>
               </a>
@@ -32,11 +36,11 @@
       </div>
     </section>
 
-    <section class="section">
+    <section id="sudoku" class="section">
       <div class="columns">
         <div class="column is-one-fifth"></div>
       
-        <div id="sudoku" class="column">
+        <div class="column is-narrow">
             <svg width="320" height="320" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="smallGrid" width="32" height="32" patternUnits="userSpaceOnUse">
@@ -74,7 +78,7 @@
             </div>
 
             <div class="columns">
-              <div class="column is-two-fifths">
+              <div class="column">
                 <b-field label="Delay (ms)">
                   <b-slider class="slider" v-model="speed" :step="1" :min="0" :max="300" @change="speedChanged">
                     <template v-for="val in [50, 150, 250]">
@@ -85,8 +89,14 @@
               </div>
             </div>
         </div>
+
+        <div class="column" v-if="steps">
+            <p>Total Steps: {{steps}}</p>
+            <p v-if="msg">{{msg}}</p>
+        </div>
       </div>
     </section>
+
     <script src="./app.js"></script>
 </body>
 </html>
